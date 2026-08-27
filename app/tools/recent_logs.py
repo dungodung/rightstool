@@ -32,25 +32,32 @@ def logs_by_wiki(username: str, hide_patrol: bool, hide_newusers: bool, meta_hos
     where = " AND ".join(conditions)
 
     def query_one(dbname, url):
+        # One round trip per wiki, not two: the total-count subquery rides
+        # along in the same SELECT instead of a separate query afterwards.
+        # This mattered in practice -- with a second query per wiki, a full
+        # ~1,000-wiki sweep took long enough to trip gunicorn's worker
+        # timeout and 500 (confirmed live), where the other all-wikis tools
+        # here (one query per wiki) finish in ~15s.
         with db.connect(wiki_db_host(dbname), db=f"{dbname}_p") as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     f"""
-                    SELECT log_type, log_namespace, log_title, comment_text, log_timestamp
+                    SELECT log_type, log_namespace, log_title, comment_text, log_timestamp,
+                        (SELECT COUNT(*) FROM logging l2 JOIN actor a2 ON l2.log_actor = a2.actor_id
+                         WHERE a2.actor_name = %s) AS total_count
                     FROM logging
                     JOIN actor ON log_actor = actor_id
                     LEFT JOIN comment ON log_comment_id = comment_id
                     WHERE actor_name = %s AND {where}
                     ORDER BY log_timestamp DESC LIMIT 10
                     """,
-                    (username,),
+                    (username, username),
                 )
-                rows = [db.decode_row(row) for row in cur.fetchall()]
-                cur.execute(
-                    "SELECT COUNT(*) FROM logging JOIN actor ON log_actor = actor_id WHERE actor_name = %s",
-                    (username,),
-                )
-                count = cur.fetchone()[0]
-        return (dbname, url, count, rows) if rows else None
+                fetched = [db.decode_row(row) for row in cur.fetchall()]
+        if not fetched:
+            return None
+        count = fetched[0][-1]
+        rows = [row[:-1] for row in fetched]
+        return (dbname, url, count, rows)
 
     return for_each_wiki(meta_host, query_one)

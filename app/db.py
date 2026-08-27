@@ -55,7 +55,14 @@ def connect(host, db=None):
         # indefinitely instead of raising so for_each_wiki's per-wiki
         # except-and-continue can actually move on (verified live: a run
         # with only connect_timeout set stalled for 20+ minutes on no
-        # visible progress).
-        read_timeout=15,
-        write_timeout=15,
+        # visible progress). 45s (not something tighter) because some
+        # legitimately-completing queries are just that slow on large wikis
+        # -- e.g. recent-logs' query against enwiki took ~42s live, not
+        # because it's inefficient but because `logging.log_actor` has no
+        # usable index there. A tighter timeout would silently truncate
+        # real results instead of just working around a hung connection;
+        # for_each_wiki now runs wikis concurrently (see app/wikis.py) so
+        # this ceiling no longer multiplies into the total request time.
+        read_timeout=45,
+        write_timeout=45,
     )
