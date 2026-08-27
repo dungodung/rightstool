@@ -3,18 +3,28 @@ from concurrent.futures import ThreadPoolExecutor
 from . import db
 
 # How many per-wiki queries to run at once. Sequential execution turned out
-# to be unworkable: `logging.log_actor` has no usable index on the large
-# wikis (confirmed live -- a bare `SELECT COUNT(*) FROM logging WHERE
-# log_actor = <id>` on enwiki, no joins or sorting, took 25.5s for 100
-# matching rows out of a huge table), so a handful of the ~1,000 wikis cost
-# 15-45s+ each. With this many workers, those all fit in roughly one round
-# instead of two-plus (confirmed live: recent-logs for a very active account
-# went from 90s at 20 workers to well under that at 40 -- there just aren't
-# many wikis that land on the slow path for any single user). Chosen as a
-# balance against the wikireplica connection-count limit per tool, not
-# tuned for raw throughput -- no connection-limit errors observed live at
-# this level, but don't keep raising it blindly.
-MAX_CONCURRENT_WIKI_QUERIES = 40
+# to be unworkable (see for_each_wiki's docstring), but so did overshooting
+# this: the wikireplica MySQL user has a hard server-side cap, confirmed
+# live via the actual error --
+#   OperationalError: (1226, "User 's...' has exceeded the
+#   'max_user_connections' resource (current value: 10)")
+# -- hit at 40 (and would hit at 20 too), which silently dropped ~1/3 of
+# wikis at random from every "all wikis" tool's results (each dropped wiki
+# just looks like it has nothing to report, since for_each_wiki treats a
+# connection failure the same as "no data for this wiki" -- this is what
+# was actually behind wikidatawiki/wikifunctionswiki/etc. intermittently
+# vanishing from results, not anything specific to those wikis). Kept a
+# couple of connections under that hard 10 rather than exactly at it, since
+# list_wikis() itself briefly holds one more.
+#
+# This is a real speed tradeoff, not a free fix: at this concurrency,
+# recent-logs for a very globally active account took ~190s live (vs ~48s
+# at the too-high 40 that was silently dropping wikis) -- see Procfile's
+# gunicorn --timeout, sized with that in mind. There's no further easy win
+# here short of Wikimedia raising the per-user connection cap; the slowness
+# is inherent to combining "no usable index for this query on large wikis"
+# with "only 8-ish requests can be in flight against the replicas at once".
+MAX_CONCURRENT_WIKI_QUERIES = 8
 
 
 def list_wikis(meta_host):
