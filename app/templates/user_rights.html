@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}User rights{% endblock %}
+{% block body %}
+<form action="{{ url_for('main.user_rights_route') }}" method="get">
+<table border="0" style="margin-left: auto; margin-right: auto;">
+<tr><td align="right" class="form">Username: </td><td colspan="2" class="form"><input type="text" name="user" id="userform" value="{{ user }}"/></td></tr>
+<tr><td align="right" class="form"><input type="checkbox" id="steward" name="steward" value="true"{{ ' checked' if steward }}/></td>
+<td class="form"><label for="steward">Stewards' view</label></td>
+<td align="right" class="form"><input type="submit" value="Go" /></td></tr>
+</table>
+</form>
+{% if user %}
+<h2 align="center">User rights for {{ user }}</h2>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>Wiki</th><th>Rights</th></tr></thead>
+<tbody>
+{% for dbname, url, rights in results %}
+<tr><td align="left"><a href="{{ url|replace('http://', 'https://') }}">{{ dbname }}</a></td>
+<td align="left">{% if steward %}<a href="https://meta.wikimedia.org/wiki/Special:Userrights?user={{ user }}%40{{ dbname }}">{{ rights|join(', ') }}</a>{% else %}{{ rights|join(', ') }}{% endif %}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% endblock %}

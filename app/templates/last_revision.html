@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Last revision{% endblock %}
+{% block body %}
+<h2><center>This page shows times of last revisions for all Wikimedia wikis</center></h2>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>Wiki</th><th>Last revision</th></tr></thead>
+<tbody>
+{% for dbname, url, ts, severity in results %}
+<tr><td align="left"><a href="{{ url|replace('http://', 'https://') }}/wiki/Special:Recentchanges">{{ dbname }}</a></td>
+<td align="left"><span class="{{ severity if severity != 'ok' }}">{{ ts|fmt_timestamp }}</span></td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

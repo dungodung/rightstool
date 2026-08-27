@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}List of rights tools{% endblock %}
+{% block body %}
+<h3>List of <span title="Dungodung">Filip</span>'s rights tools</h3>
+<ul>
+<li><a href="{{ url_for('main.user_rights_route') }}">User rights</a></li>
+<li><a href="{{ url_for('main.recent_logs_route') }}">Recent logs</a></li>
+<li><a href="{{ url_for('main.available_rights_route') }}">Available rights</a></li>
+<li><a href="{{ url_for('main.last_revision_route') }}">Time of the last revision</a></li>
+<li><a href="{{ url_for('main.rights_changes_route') }}">Number of rights changes per meta user</a></li>
+<li><a href="{{ url_for('main.rights_log_search_route') }}">Rights log search</a></li>
+<li><a href="{{ url_for('main.rights_statistics_route') }}">User rights statistics</a></li>
+<li><a href="{{ url_for('main.steward_activity_route') }}">Stewards activity statistics</a></li>
+<li><a href="{{ url_for('main.sysop_inactivity_route') }}">Sysop inactivity statistics</a></li>
+<li><a href="{{ url_for('main.checkusers_route') }}">Checkuser statistics</a></li>
+</ul>
+{% endblock %}

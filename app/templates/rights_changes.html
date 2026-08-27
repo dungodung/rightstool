@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}User rights changes{% endblock %}
+{% block body %}
+<h2 align="center">User rights changes</h2>
+<h4 align="center">This tool lists all the users on meta by the number of user rights changes they have performed</h4>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>User</th><th>Number</th></tr></thead>
+<tbody>
+{% for username, number in results %}
+<tr><td align="left"><a href="https://meta.wikimedia.org/wiki/User:{{ username }}">{{ username|replace('_', ' ') }}</a></td>
+<td align="left"><a href="https://meta.wikimedia.org/w/index.php?title=Special:Log&type=rights&user={{ username }}">{{ number }}</a></td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

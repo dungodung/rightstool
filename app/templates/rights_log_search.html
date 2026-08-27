@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Rights log search{% endblock %}
+{% block body %}
+<form action="{{ url_for('main.rights_log_search_route') }}" method="get">
+<table border="0" style="margin-left: auto; margin-right: auto;">
+<tr><td align="right" class="form">Username: </td><td class="form"><input type="text" name="user" id="userform" value="{{ user }}"/></td>
+<td align="left" class="form"><input type="submit" value="Go" /></td></tr>
+<tr><td align="right" class="form"><input type="checkbox" id="who" name="who" value="false"{{ ' checked' if not search_users }}/></td>
+<td class="form"><label for="who">Don't search users</label></td></tr>
+<tr><td align="right" class="form"><input type="checkbox" id="whom" name="whom" value="false"{{ ' checked' if not search_titles }}/></td>
+<td class="form"><label for="whom">Don't search titles</label></td></tr>
+</table>
+</form>
+{% if user %}
+{% if not search_users and not search_titles %}
+<h2 align="center">You cannot check both boxes!</h2>
+{% else %}
+<h2 align="center">User rights logs search for "{{ user }}"</h2>
+{% if results %}
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>User</th><th>Title</th><th>Rights</th><th>Comment</th><th>Time</th></tr></thead>
+<tbody>
+{% for username, title, params, comment, ts in results %}
+<tr><td align="left"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=rights&user={{ username|urlencode }}">{{ username|replace('_', ' ') }}</a></td>
+<td align="left"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=rights&page=User%3A{{ title|urlencode }}">{{ title|replace('_', ' ') }}</a></td>
+<td align="left">{{ params|fmt_log_params }}</td>
+<td align="left">{{ comment or '&nbsp;'|safe }}</td>
+<td align="left">{{ ts|fmt_timestamp }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% endif %}
+{% endif %}
+{% endblock %}

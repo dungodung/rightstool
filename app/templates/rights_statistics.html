@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}User rights statistics{% endblock %}
+{% block body %}
+<h2 align="center">User rights statistics</h2>
+{% for right, rows in data.items() %}
+<h3 align="center"><a name="{{ right }}">{{ right }}</a></h3>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>Wiki</th><th>Number of users</th></tr></thead>
+<tbody>
+{% for dbname, url, count in rows %}
+<tr><td align="left"><a href="{{ url|replace('http://', 'https://') }}/">{{ dbname }}</a></td>
+<td align="left"><a href="{{ url|replace('http://', 'https://') }}/wiki/Special:Listusers?group={{ right }}">{{ count }}</a></td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='tools.css') }}" type="text/css" />
+<script src="{{ url_for('static', filename='sortable.js') }}" defer></script>
+{% block head %}{% endblock %}
+<title>{% block title %}rightstool{% endblock %}</title>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Available rights{% endblock %}
+{% block body %}
+<h2 align="center">Available user rights</h2>
+<h4 align="center">This tool lists all the available user rights per project except the default, global ones</h4>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>Wiki</th><th>Available rights</th></tr></thead>
+<tbody>
+{% for dbname, url, rights in results %}
+<tr><td align="left"><a href="{{ url|replace('http://', 'https://') }}/">{{ dbname }}</a></td>
+<td align="left">{{ rights|join(', ') }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

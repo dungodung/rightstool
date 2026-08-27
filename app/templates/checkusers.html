@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Checkuser statistics{% endblock %}
+{% block body %}
+<h2 align="center">List of users that hold checkuser right</h2>
+{% for dbname, url, rows in results %}
+<h3 align="center"><a href="{{ url|replace('http://', 'https://') }}">{{ dbname }}</a></h3>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>User</th><th>User right</th></tr></thead>
+<tbody>
+{% for username, right in rows %}
+<tr><td align="left"><a href="{{ url|replace('http://', 'https://') }}/wiki/User:{{ username|urlencode }}">{{ username }}</a></td>
+<td align="left">{{ right }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endfor %}
+{% endblock %}

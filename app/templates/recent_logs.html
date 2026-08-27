@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Recent logs{% endblock %}
+{% block body %}
+<form action="{{ url_for('main.recent_logs_route') }}" method="get">
+<table border="0" style="margin-left: auto; margin-right: auto;">
+<tr><td align="left" class="form">
+Username: <input type="text" name="user" id="userform" value="{{ user }}"/>
+<input type="submit" value="Go" />
+</td></tr>
+<tr><td align="left" class="form">
+<input type="checkbox" id="patrol" name="patrol" value="false"{{ ' checked' if hide_patrol }}/>
+<label for="patrol">hide patrol log</label>
+<input type="checkbox" id="newusers" name="newusers" value="false"{{ ' checked' if hide_newusers }}/>
+<label for="newusers">hide new users log</label>
+</td></tr>
+</table>
+</form>
+{% if user %}
+<h2 align="center">Recent log actions for {{ user }}</h2>
+{% for dbname, url, count, rows in results %}
+<h3 align="center"><a href="{{ url|replace('http://', 'https://') }}/wiki/Special:Log?user={{ user }}">{{ dbname }}</a></h3>
+<h4 align="center">Total of {{ count }} log action(s)</h4>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>Log type</th><th>Time</th><th>Title</th><th>Comment</th></tr></thead>
+<tbody>
+{% for log_type, ns, title, comment, ts in rows %}
+<tr><td align="left">{{ log_type }}</td><td align="left">{{ ts|fmt_timestamp }}</td>
+<td align="left">{{ ns|ns_prefix }}{{ title }}</td><td align="left">{{ comment or '&nbsp;'|safe }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endfor %}
+<br/><h4>Total number of log actions: {{ total_count }}.</h4>
+{% endif %}
+{% endblock %}

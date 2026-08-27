@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Sysop inactivity{% endblock %}
+{% block head %}
+<script>
+function validate() {
+ var pat = /\d{14}|^$/;
+ if(!pat.test(document.siform.timestamp.value)){
+  alert("Timestamp must be either empty or in the following format: YYYYMMDDHHMMSS.");
+  document.siform.timestamp.focus();
+  return false;
+ } else return true;
+}
+</script>
+{% endblock %}
+{% block body %}
+<form action="{{ url_for('main.sysop_inactivity_route') }}" method="get" name="siform" onsubmit="return validate();">
+<table border="0" style="margin-left: auto; margin-right: auto;">
+<tr><td align="right" class="form"><span title="Format: YYYYMMDDHHMMSS">Timestamp</span>: </td>
+<td colspan="2" class="form"><input type="text" name="timestamp" id="timestampform" value="{{ timestamp }}"/></td><td class="form">&nbsp;</td></tr>
+<tr><td align="right" colspan="3" class="form"><select name="wiki" id="dbform">
+<option value=""{{ ' selected' if not wiki }}>Select a wiki</option>
+{% for dbname in all_wikis %}
+<option value="{{ dbname }}"{{ ' selected' if dbname == wiki }}>{{ dbname }}</option>
+{% endfor %}
+</select></td>
+<td align="right" class="form"><input type="submit" value="Go" /></td></tr>
+</table>
+</form>
+{% if wiki %}
+<h2 align="center">Inactive sysops on <a href="{{ site }}">{{ wiki }}</a>{% if timestamp %} since {{ timestamp|fmt_timestamp }}{% endif %}</h2>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center"><th>User</th><th>Last action</th></tr></thead>
+<tbody>
+{% for username, ts in results %}
+<tr><td align="left"><a href="{{ site }}/wiki/User:{{ username|urlencode }}">{{ username }}</a></td>
+<td align="center">{{ ts|fmt_timestamp }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% endblock %}

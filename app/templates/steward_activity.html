@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Stewards activity statistics{% endblock %}
+{% block body %}
+<h2 align="center">Stewards activity statistics</h2>
+<h4 align="center">Lists times of the last log actions per steward</h4>
+<table border="1" cellpadding="4" cellspacing="1" style="margin-left: auto; margin-right: auto;" class="sortable">
+<thead><tr align="center">
+<th><a href="https://meta.wikimedia.org/wiki/Special:Log/rights">User rights</a></th>
+<th><a href="https://meta.wikimedia.org/wiki/Special:Log/gblrights">Global rights</a></th>
+<th><a href="https://meta.wikimedia.org/wiki/Special:Log/globalauth">GlobalAuth</a></th>
+<th><a href="https://meta.wikimedia.org/wiki/Special:Log/gblblock">Global block</a></th>
+</tr></thead>
+<tbody>
+{% for username, by_type in results %}
+<tr><td align="left"><a href="https://meta.wikimedia.org/wiki/User:{{ username|urlencode }}">{{ username }}</a></td>
+<td align="center"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=rights&user={{ username|urlencode }}">{{ by_type.rights|fmt_timestamp }}</a></td>
+<td align="center"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=gblrights&user={{ username|urlencode }}">{{ by_type.gblrights|fmt_timestamp }}</a></td>
+<td align="center"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=globalauth&user={{ username|urlencode }}">{{ by_type.globalauth|fmt_timestamp }}</a></td>
+<td align="center"><a href="https://meta.wikimedia.org/wiki/Special:Log?type=gblblock&user={{ username|urlencode }}">{{ by_type.gblblock|fmt_timestamp }}</a></td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
